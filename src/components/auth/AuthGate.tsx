@@ -3,7 +3,7 @@ import { LogOut } from "lucide-react";
 
 import { Button } from "@/components/kit/Button";
 import { Card, CardBody, CardHeader } from "@/components/kit/Card";
-import { Input } from "@/components/kit/Input";
+import { Input, PasswordInput } from "@/components/kit/Input";
 import { Field } from "@/components/kit/Field";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -77,8 +77,7 @@ function AuthScreen() {
               />
             </Field>
             <Field label="Password">
-              <Input
-                type="password"
+              <PasswordInput
                 autoComplete={mode === "signin" ? "current-password" : "new-password"}
                 required
                 minLength={6}

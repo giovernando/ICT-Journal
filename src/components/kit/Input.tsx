@@ -1,4 +1,6 @@
 import { forwardRef, type InputHTMLAttributes, type TextareaHTMLAttributes } from "react";
+import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 const base =
@@ -10,6 +12,34 @@ export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputE
   ),
 );
 Input.displayName = "Input";
+
+export const PasswordInput = forwardRef<
+  HTMLInputElement,
+  Omit<InputHTMLAttributes<HTMLInputElement>, "type">
+>(({ className, ...props }, ref) => {
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <div className="relative">
+      <input
+        ref={ref}
+        type={visible ? "text" : "password"}
+        className={cn(base, "h-11 pr-11", className)}
+        {...props}
+      />
+      <button
+        type="button"
+        aria-label={visible ? "Sembunyikan password" : "Tampilkan password"}
+        aria-pressed={visible}
+        onClick={() => setVisible((current) => !current)}
+        className="absolute right-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60"
+      >
+        {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+      </button>
+    </div>
+  );
+});
+PasswordInput.displayName = "PasswordInput";
 
 export const Textarea = forwardRef<
   HTMLTextAreaElement,
