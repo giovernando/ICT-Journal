@@ -65,6 +65,9 @@ function AuthScreen() {
           description="Data trade kamu privat — hanya bisa dilihat oleh akun kamu sendiri."
         />
         <CardBody>
+          <p className="mb-4 rounded-xl border border-primary/20 bg-primary/5 px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
+            Email tidak harus aktif. Kamu bebas menggunakan alamat email apa saja selama formatnya valid.
+          </p>
           <form className="grid gap-4" onSubmit={submit}>
             <Field label="Email">
               <Input
