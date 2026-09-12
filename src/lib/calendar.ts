@@ -1,4 +1,5 @@
 import type { Currency, Trade } from "@/types/trade";
+import { tradeRR } from "@/lib/reports";
 
 export interface DayCell {
   /** yyyy-mm-dd */
@@ -7,6 +8,7 @@ export interface DayCell {
   inMonth: boolean;
   trades: number;
   pnl: number;
+  rr: number | null;
 }
 
 export interface WeekRow {
@@ -14,6 +16,7 @@ export interface WeekRow {
   days: DayCell[];
   trades: number;
   pnl: number;
+  rr: number | null;
   label: string;
 }
 
@@ -27,15 +30,17 @@ export function buildMonthGrid(
   month: number,
   currency: Currency,
 ): { weeks: WeekRow[]; monthPnl: number; monthTrades: number } {
-  const byDay = new Map<string, { trades: number; pnl: number }>();
+  const byDay = new Map<string, { trades: number; pnl: number; rr: number | null }>();
   for (const t of trades) {
     if ((t.currency ?? "USD") !== currency) continue;
     const d = new Date(t.date);
     if (Number.isNaN(d.getTime())) continue;
     const key = dayKey(d);
-    const cur = byDay.get(key) ?? { trades: 0, pnl: 0 };
+    const cur = byDay.get(key) ?? { trades: 0, pnl: 0, rr: null };
     cur.trades += 1;
     cur.pnl += Number(t.pnl) || 0;
+    const rr = tradeRR(t);
+    if (rr !== null) cur.rr = (cur.rr ?? 0) + rr;
     byDay.set(key, cur);
   }
 
@@ -53,16 +58,25 @@ export function buildMonthGrid(
     const days: DayCell[] = [];
     let pnl = 0;
     let count = 0;
+    let rr: number | null = null;
     for (let i = 0; i < 7; i++) {
       const date = new Date(start.getTime());
       date.setDate(start.getDate() + w * 7 + i);
       const key = dayKey(date);
-      const stat = byDay.get(key) ?? { trades: 0, pnl: 0 };
+      const stat = byDay.get(key) ?? { trades: 0, pnl: 0, rr: null };
       const inMonth = date.getMonth() === month;
-      days.push({ key, date, inMonth, trades: stat.trades, pnl: stat.pnl });
+      days.push({
+        key,
+        date,
+        inMonth,
+        trades: stat.trades,
+        pnl: stat.pnl,
+        rr: stat.rr === null ? null : Math.round(stat.rr * 100) / 100,
+      });
       if (inMonth) {
         pnl += stat.pnl;
         count += stat.trades;
+        if (stat.rr !== null) rr = (rr ?? 0) + stat.rr;
       }
     }
     weeks.push({
@@ -70,6 +84,7 @@ export function buildMonthGrid(
       days,
       pnl: Math.round(pnl * 100) / 100,
       trades: count,
+      rr: rr === null ? null : Math.round(rr * 100) / 100,
       label: `Week ${w + 1}`,
     });
     monthPnl += pnl;

@@ -2,12 +2,7 @@ import { Badge } from "@/components/kit/Badge";
 import { Button } from "@/components/kit/Button";
 import { RRValue, RR_TOOLTIP } from "@/components/trades/RRValue";
 import { formatMoney } from "@/lib/money";
-import {
-  BIAS_TONE,
-  POSITION_TONE,
-  STATUS_TONE,
-  formatTradeDate,
-} from "@/lib/trade-options";
+import { BIAS_TONE, POSITION_TONE, STATUS_TONE, formatTradeDate } from "@/lib/trade-options";
 import type { Trade } from "@/types/trade";
 
 interface TradeTableProps {
@@ -16,6 +11,7 @@ interface TradeTableProps {
   onDelete: (id: string) => void;
   /** Number shown for the first row (1-based) */
   startNumber?: number;
+  readOnly?: boolean;
 }
 
 const headers = [
@@ -36,22 +32,29 @@ const headers = [
   "",
 ];
 
-
-export function TradeTable({ trades, onEdit, onDelete, startNumber = 1 }: TradeTableProps) {
+export function TradeTable({
+  trades,
+  onEdit,
+  onDelete,
+  startNumber = 1,
+  readOnly = false,
+}: TradeTableProps) {
   return (
     <div className="-mx-4 w-full max-w-full overflow-x-auto overscroll-x-contain px-4 [-webkit-overflow-scrolling:touch] sm:-mx-6 sm:px-6">
       <table className="w-full min-w-[960px] border-separate border-spacing-0 text-sm">
         <thead>
           <tr>
-            {headers.map((h, i) => (
-              <th
-                key={`${h}-${i}`}
-                title={h === "RR" ? RR_TOOLTIP : undefined}
-                className="sticky top-0 border-b border-border/60 bg-card/60 px-3 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground backdrop-blur-md"
-              >
-                {h}
-              </th>
-            ))}
+            {headers.map((h, i) =>
+              readOnly && h === "" ? null : (
+                <th
+                  key={`${h}-${i}`}
+                  title={h === "RR" ? RR_TOOLTIP : undefined}
+                  className="sticky top-0 border-b border-border/60 bg-card/60 px-3 py-2.5 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground backdrop-blur-md"
+                >
+                  {h}
+                </th>
+              ),
+            )}
           </tr>
         </thead>
         <tbody>
@@ -119,19 +122,21 @@ export function TradeTable({ trades, onEdit, onDelete, startNumber = 1 }: TradeT
                   <span className="text-xs text-muted-foreground">—</span>
                 )}
               </td>
-              <td className="whitespace-nowrap border-b border-border/40 px-3 py-3 text-right">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="mr-1.5 border border-primary/25 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary"
-                  onClick={() => onEdit(trade)}
-                >
-                  Edit
-                </Button>
-                <Button variant="danger" size="sm" onClick={() => onDelete(trade.id)}>
-                  Hapus
-                </Button>
-              </td>
+              {!readOnly ? (
+                <td className="whitespace-nowrap border-b border-border/40 px-3 py-3 text-right">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="mr-1.5 border border-primary/25 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary"
+                    onClick={() => onEdit(trade)}
+                  >
+                    Edit
+                  </Button>
+                  <Button variant="danger" size="sm" onClick={() => onDelete(trade.id)}>
+                    Hapus
+                  </Button>
+                </td>
+              ) : null}
             </tr>
           ))}
         </tbody>

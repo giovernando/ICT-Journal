@@ -4,6 +4,9 @@ import { Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Card, CardBody, CardHeader } from "@/components/kit/Card";
 import { CalendarSkeleton } from "@/components/trades/Skeletons";
+import { TradeTable } from "@/components/trades/TradeTable";
+import { RRValue, RR_TOOLTIP } from "@/components/trades/RRValue";
+import { Modal } from "@/components/kit/Modal";
 import { Select } from "@/components/kit/Input";
 import { useTrades } from "@/hooks/useTrades";
 import { WEEKDAY_LABELS, buildMonthGrid, monthLabel } from "@/lib/calendar";
@@ -22,6 +25,7 @@ export function CalendarPage() {
   const today = new Date();
   const [cursor, setCursor] = useState({ year: today.getFullYear(), month: today.getMonth() });
   const [currency, setCurrency] = useState<Currency>("USD");
+  const [selectedDayKey, setSelectedDayKey] = useState<string | null>(null);
 
   const { weeks, monthPnl, monthTrades } = useMemo(
     () => buildMonthGrid(trades, cursor.year, cursor.month, currency),
@@ -33,6 +37,15 @@ export function CalendarPage() {
     setCursor({ year: d.getFullYear(), month: d.getMonth() });
   };
   const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+  const selectedDayTrades = selectedDayKey
+    ? trades
+        .filter((trade) => {
+          const date = new Date(trade.date);
+          const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+          return key === selectedDayKey;
+        })
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    : [];
 
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -45,8 +58,8 @@ export function CalendarPage() {
             Profit harian & mingguan
           </h1>
           <p className="mt-1.5 max-w-xl text-sm text-muted-foreground">
-            Setiap tanggal menampilkan total profit/loss dan jumlah trade hari itu, dengan
-            rekap mingguan di kolom paling kanan.
+            Setiap tanggal menampilkan total profit/loss dan jumlah trade hari itu, dengan rekap
+            mingguan di kolom paling kanan.
           </p>
           <div className="mt-3 flex gap-2">
             <Link
@@ -131,9 +144,20 @@ export function CalendarPage() {
                               day.inMonth ? "" : "opacity-35"
                             } ${day.key === todayKey ? "ring-2 ring-primary/50" : ""}`}
                           >
-                            <p className="text-[11px] font-semibold text-foreground/70">
-                              {day.date.getDate()}
-                            </p>
+                            <div className="flex items-center justify-between gap-1">
+                              <p className="text-[11px] font-semibold text-foreground/70">
+                                {day.date.getDate()}
+                              </p>
+                              {day.trades > 0 ? (
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedDayKey(day.key)}
+                                  className="text-[10px] font-semibold text-primary underline-offset-2 hover:underline"
+                                >
+                                  Detail
+                                </button>
+                              ) : null}
+                            </div>
                             {day.trades > 0 ? (
                               <>
                                 <p className="mt-1 text-xs font-bold tabular-nums">
@@ -142,6 +166,9 @@ export function CalendarPage() {
                                 <p className="text-[10px] text-muted-foreground">
                                   {day.trades} trade
                                 </p>
+                                <div title={RR_TOOLTIP} className="mt-1">
+                                  <RRValue rr={day.rr} className="text-[10px]" />
+                                </div>
                               </>
                             ) : (
                               <p className="mt-1 text-[10px] text-muted-foreground/60">—</p>
@@ -164,6 +191,9 @@ export function CalendarPage() {
                             {formatMoney(week.pnl, currency)}
                           </p>
                           <p className="text-[10px] text-muted-foreground">{week.trades} trade</p>
+                          <div title={RR_TOOLTIP} className="mt-1">
+                            <RRValue rr={week.rr} className="text-[10px]" />
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -175,6 +205,31 @@ export function CalendarPage() {
         </Card>
       </div>
       <BottomNav />
+      <Modal
+        open={selectedDayKey !== null}
+        onClose={() => setSelectedDayKey(null)}
+        title={
+          selectedDayTrades.length > 0
+            ? `Trade ${new Date(selectedDayTrades[0].date).toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}`
+            : "Detail trade"
+        }
+        className="sm:max-w-6xl"
+      >
+        {selectedDayTrades.length > 0 ? (
+          <TradeTable
+            trades={selectedDayTrades}
+            readOnly
+            onEdit={() => undefined}
+            onDelete={() => undefined}
+          />
+        ) : (
+          <p className="text-sm text-muted-foreground">Tidak ada trade pada tanggal ini.</p>
+        )}
+      </Modal>
     </div>
   );
 }

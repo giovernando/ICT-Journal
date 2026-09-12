@@ -5,7 +5,7 @@ import { Camera, Trash2, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/kit/Button";
 import { Card, CardBody, CardHeader } from "@/components/kit/Card";
 import { Field } from "@/components/kit/Field";
-import { Input } from "@/components/kit/Input";
+import { Input, PasswordInput } from "@/components/kit/Input";
 import { BottomNav } from "@/components/trades/BottomNav";
 import { TopBar } from "@/components/trades/TopBar";
 import { useAuth } from "@/hooks/useAuth";
@@ -131,7 +131,10 @@ export function SettingsPage() {
           <Card>
             <CardHeader title="Nama tampilan" description={user?.email ?? ""} />
             <CardBody>
-              <form className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end" onSubmit={submitName}>
+              <form
+                className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end"
+                onSubmit={submitName}
+              >
                 <Field label="Nama" hint="Maksimal 60 karakter">
                   <Input
                     value={loading ? "" : name}
@@ -152,8 +155,7 @@ export function SettingsPage() {
             <CardBody>
               <form className="grid gap-4" onSubmit={submitPassword}>
                 <Field label="Kata sandi saat ini">
-                  <Input
-                    type="password"
+                  <PasswordInput
                     autoComplete="current-password"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
@@ -161,8 +163,7 @@ export function SettingsPage() {
                 </Field>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Field label="Kata sandi baru">
-                    <Input
-                      type="password"
+                    <PasswordInput
                       autoComplete="new-password"
                       minLength={6}
                       value={newPassword}
@@ -170,8 +171,7 @@ export function SettingsPage() {
                     />
                   </Field>
                   <Field label="Ulangi kata sandi baru" error={passwordError ?? undefined}>
-                    <Input
-                      type="password"
+                    <PasswordInput
                       autoComplete="new-password"
                       minLength={6}
                       value={confirmPassword}

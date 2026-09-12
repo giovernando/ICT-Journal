@@ -54,14 +54,21 @@ export function ReportsPage() {
 
   const buckets = useMemo(() => withCumulative(groupTrades(trades, mode)), [trades, mode]);
   const total = useMemo(() => overall(trades), [trades]);
-  const best = useMemo(
-    () => buckets.reduce<(typeof buckets)[number] | null>((a, b) => (!a || b.netRR > a.netRR ? b : a), null),
-    [buckets],
-  );
-  const worst = useMemo(
-    () => buckets.reduce<(typeof buckets)[number] | null>((a, b) => (!a || b.netRR < a.netRR ? b : a), null),
-    [buckets],
-  );
+  const { best, worst } = useMemo(() => {
+    if (buckets.length === 0) return { best: null, worst: null };
+
+    const byBest = [...buckets].sort(
+      (a, b) => b.netRR - a.netRR || b.netPnl - a.netPnl || b.key.localeCompare(a.key),
+    );
+    const byWorst = [...buckets].sort(
+      (a, b) => a.netRR - b.netRR || a.netPnl - b.netPnl || a.key.localeCompare(b.key),
+    );
+
+    return {
+      best: byBest[0],
+      worst: byWorst[0],
+    };
+  }, [buckets]);
 
   return (
     <div className="relative min-h-screen overflow-hidden">
