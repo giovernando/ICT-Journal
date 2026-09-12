@@ -5,6 +5,24 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@keyframes splash-progress {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  50% {
+    transform: translateX(100%);
+  }
+
+  100% {
+    transform: translateX(220%);
+  }
+}
+
+.splash-progress {
+  animation: splash-progress 1.2s ease-in-out infinite;
+}
+
 /*
  * Design system definition.
  *
