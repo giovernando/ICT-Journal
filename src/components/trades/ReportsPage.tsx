@@ -1,7 +1,9 @@
 import { BottomNav } from "@/components/trades/BottomNav";
 import { TopBar } from "@/components/trades/TopBar";
-import { ClientOnly, Link } from "@tanstack/react-router";
+import { ClientOnly } from "@tanstack/react-router";
+import { CalendarDays } from "lucide-react";
 import { useMemo, useState } from "react";
+import type { DateRange } from "react-day-picker";
 import {
   Bar,
   BarChart,
@@ -17,7 +19,14 @@ import {
 import { Card, CardBody, CardHeader } from "@/components/kit/Card";
 import { Select } from "@/components/kit/Input";
 import { RRValue, RR_TOOLTIP } from "@/components/trades/RRValue";
-import { ChartSkeleton, SummaryTilesSkeleton } from "@/components/trades/Skeletons";
+import {
+  ChartSkeleton,
+  PairPerformanceSkeleton,
+  ReportsSkeleton,
+  SummaryTilesSkeleton,
+} from "@/components/trades/Skeletons";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useTrades } from "@/hooks/useTrades";
 import { CURRENCY_OPTIONS, formatMoney, formatTotals } from "@/lib/money";
 import type { Currency } from "@/types/trade";
@@ -34,6 +43,9 @@ export function ReportsPage() {
   const [mode, setMode] = useState<Mode>("week");
   const [pairFilter, setPairFilter] = useState<string>(ALL_PAIRS);
   const [currency, setCurrency] = useState<string>(ALL_CURRENCIES);
+  const [periodFrom, setPeriodFrom] = useState("");
+  const [periodTo, setPeriodTo] = useState("");
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const displayCurrency: Currency =
     currency === ALL_CURRENCIES ? "USD" : (currency as Currency);
 
@@ -48,27 +60,49 @@ export function ReportsPage() {
         .filter((t) => (currency === ALL_CURRENCIES ? true : (t.currency ?? "USD") === currency)),
     [allTrades, pairFilter, currency],
   );
+  const reportTrades = useMemo(() => {
+    if (!periodFrom && !periodTo) return trades;
+
+    const from = periodFrom ? new Date(`${periodFrom}T00:00:00`) : null;
+    const to = periodTo ? new Date(`${periodTo}T00:00:00`) : null;
+    if (to) to.setDate(to.getDate() + 1);
+
+    return trades.filter((trade) => {
+      const date = new Date(trade.date);
+      if (Number.isNaN(date.getTime())) return false;
+      if (from && date < from) return false;
+      if (to && date >= to) return false;
+      return true;
+    });
+  }, [periodFrom, periodTo, trades]);
+  const selectedRange = useMemo<DateRange | undefined>(() => {
+    const from = periodFrom ? new Date(`${periodFrom}T00:00:00`) : undefined;
+    const to = periodTo ? new Date(`${periodTo}T00:00:00`) : undefined;
+    return from ? { from, to } : undefined;
+  }, [periodFrom, periodTo]);
   const moneyLabel = (amount: number) =>
     currency === ALL_CURRENCIES ? formatMoney(amount, displayCurrency) : formatMoney(amount, displayCurrency);
-  const pairStats = useMemo(() => groupByPair(trades), [trades]);
+  const pairStats = useMemo(() => groupByPair(reportTrades), [reportTrades]);
 
-  const buckets = useMemo(() => withCumulative(groupTrades(trades, mode)), [trades, mode]);
-  const total = useMemo(() => overall(trades), [trades]);
-  const { best, worst } = useMemo(() => {
-    if (buckets.length === 0) return { best: null, worst: null };
+  const buckets = useMemo(() => withCumulative(groupTrades(reportTrades, mode)), [reportTrades, mode]);
+  const total = useMemo(() => overall(reportTrades), [reportTrades]);
+  const { best } = useMemo(() => {
+    if (buckets.length === 0) return { best: null };
 
     const byBest = [...buckets].sort(
       (a, b) => b.netRR - a.netRR || b.netPnl - a.netPnl || b.key.localeCompare(a.key),
     );
-    const byWorst = [...buckets].sort(
-      (a, b) => a.netRR - b.netRR || a.netPnl - b.netPnl || a.key.localeCompare(b.key),
-    );
 
     return {
-      best: byBest[0],
-      worst: byWorst[0],
+      best: byBest[0] ?? null,
     };
   }, [buckets]);
+  const worstWeek = useMemo(() => {
+    const weeklyBuckets = groupTrades(reportTrades, "week");
+    return [...weeklyBuckets].sort(
+      (a, b) => a.netRR - b.netRR || a.netPnl - b.netPnl || a.key.localeCompare(b.key),
+    )[0] ?? null;
+  }, [reportTrades]);
 
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -134,7 +168,7 @@ export function ReportsPage() {
                 total.netPnl > 0 ? "text-emerald-400" : total.netPnl < 0 ? "text-rose-400" : ""
               }`}
             >
-              {currency === ALL_CURRENCIES ? formatTotals(trades) : moneyLabel(total.netPnl)}
+              {currency === ALL_CURRENCIES ? formatTotals(reportTrades) : moneyLabel(total.netPnl)}
             </p>
           </div>
           <div
@@ -161,23 +195,69 @@ export function ReportsPage() {
         <Card className="mt-6 min-w-0">
           <CardHeader
             title={`Profit / Loss ${MODE_LABEL[mode]}`}
-            description="Net R per periode — hijau profit, merah loss"
+            description={
+              periodFrom || periodTo
+                ? "Periode terpilih — data mengikuti rentang tanggal"
+                : "Net R per periode — hijau profit, merah loss"
+            }
             action={
-              <div className="flex rounded-xl border border-border/60 bg-card/40 p-0.5">
-                {(["week", "month"] as Mode[]).map((m) => (
-                  <button
-                    key={m}
-                    type="button"
-                    onClick={() => setMode(m)}
-                    className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-                      mode === m
-                        ? "bg-primary/15 text-primary"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {MODE_LABEL[m]}
-                  </button>
-                ))}
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label="Pilih rentang tanggal laporan"
+                      className="inline-flex h-9 items-center gap-2 rounded-xl border border-border/70 bg-card/50 px-3 text-xs font-semibold text-foreground shadow-[inset_0_1px_0_0_rgb(255_255_255/0.04)] transition-colors hover:border-border"
+                    >
+                      <CalendarDays className="h-3.5 w-3.5 text-muted-foreground" />
+                      {periodFrom || periodTo ? formatDateRangeLabel(periodFrom, periodTo) : "Semua periode"}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className="w-auto p-0">
+                    <Calendar
+                      mode="range"
+                      selected={selectedRange}
+                      onSelect={(range: DateRange | undefined) => {
+                        setPeriodFrom(range?.from ? toDateInputValue(range.from) : "");
+                        setPeriodTo(range?.to ? toDateInputValue(range.to) : "");
+                      }}
+                      numberOfMonths={1}
+                      captionLayout="dropdown"
+                      {...(selectedRange?.from ? { defaultMonth: selectedRange.from } : {})}
+                    />
+                    {periodFrom || periodTo ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPeriodFrom("");
+                          setPeriodTo("");
+                          setCalendarOpen(false);
+                        }}
+                        className="mb-3 ml-3 text-xs font-semibold text-primary hover:underline"
+                      >
+                        Hapus rentang
+                      </button>
+                    ) : null}
+                  </PopoverContent>
+                </Popover>
+                <div className="flex rounded-xl border border-border/60 bg-card/40 p-0.5">
+                  {(["week", "month"] as Mode[]).map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => {
+                        setMode(m);
+                      }}
+                      className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+                        mode === m
+                          ? "bg-primary/15 text-primary"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {MODE_LABEL[m]}
+                    </button>
+                  ))}
+                </div>
               </div>
             }
           />
@@ -189,7 +269,7 @@ export function ReportsPage() {
             ) : null}
 
             {!hydrated ? (
-              <p className="py-12 text-center text-sm text-muted-foreground">Memuat data…</p>
+              <ReportsSkeleton />
             ) : buckets.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-border/60 px-6 py-14 text-center">
                 <p className="text-sm font-medium">Belum ada data untuk dilaporkan</p>
@@ -279,7 +359,7 @@ export function ReportsPage() {
 
                 <div className="grid gap-2 sm:grid-cols-2">
                   <HighlightTile label={`${MODE_LABEL[mode]} terbaik`} bucket={best} />
-                  <HighlightTile label={`${MODE_LABEL[mode]} terburuk`} bucket={worst} />
+                  <HighlightTile label="Minggu terburuk" bucket={worstWeek} />
                 </div>
 
                 <div className="w-full max-w-full overflow-x-auto [-webkit-overflow-scrolling:touch]">
@@ -338,7 +418,7 @@ export function ReportsPage() {
           />
           <CardBody className="min-w-0 space-y-6">
             {!hydrated ? (
-              <p className="py-12 text-center text-sm text-muted-foreground">Memuat data…</p>
+              <PairPerformanceSkeleton />
             ) : pairStats.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-border/60 px-6 py-14 text-center">
                 <p className="text-sm font-medium">Belum ada data pair</p>
@@ -438,6 +518,24 @@ function SummaryTile({ label, value }: { label: string; value: string }) {
       <p className="mt-0.5 text-lg font-semibold tracking-tight text-foreground">{value}</p>
     </div>
   );
+}
+
+function toDateInputValue(date: Date) {
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${date.getFullYear()}-${month}-${day}`;
+}
+
+function formatDateRangeLabel(from: string, to: string) {
+  const format = (value: string) =>
+    new Date(`${value}T00:00:00`).toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  if (!from) return `Sampai ${format(to)}`;
+  if (!to || from === to) return format(from);
+  return `${format(from)} – ${format(to)}`;
 }
 
 function HighlightTile({
