@@ -1,7 +1,5 @@
 # Trade Journal Pro
 
-Tolong buatkan kode lengkap untuk aplikasi PWA Trading Journal berbasis React, TypeScript, dan Tailwind CSS. 
-
 ### 1. Arsitektur & Aturan Kode
 
 - **Pemisahan UI dan Logic (Separation of Concerns):** Pisahkan antara komponen UI murni (Presentational Components) dan business logic/state management (Custom Hooks / Container components). Jangan menumpuk state/logic di dalam komponen tampilan utama.
