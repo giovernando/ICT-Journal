@@ -55,6 +55,7 @@ export type Database = {
           quartal: string
           raid: string
           rr: number | null
+          rr_ratio: string | null
           screenshot: string | null
           status: string
           user_id: string | null
@@ -75,6 +76,7 @@ export type Database = {
           quartal?: string
           raid?: string
           rr?: number | null
+          rr_ratio?: string | null
           screenshot?: string | null
           status?: string
           user_id?: string | null
@@ -95,6 +97,7 @@ export type Database = {
           quartal?: string
           raid?: string
           rr?: number | null
+          rr_ratio?: string | null
           screenshot?: string | null
           status?: string
           user_id?: string | null

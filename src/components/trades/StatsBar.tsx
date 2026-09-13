@@ -1,14 +1,14 @@
 import { Card } from "@/components/kit/Card";
 import type { TradeStats } from "@/hooks/useTrades";
 
-export function StatsBar({ stats }: { stats: TradeStats }) {
+export function StatsBar({ stats, rrRatio }: { stats: TradeStats; rrRatio?: string | null }) {
   const items = [
     { label: "Total Trade", value: String(stats.total), tone: "text-foreground" },
     { label: "Win Rate", value: `${stats.winRate}%`, tone: "text-emerald-400" },
     { label: "Win / Lose", value: `${stats.wins} / ${stats.losses}`, tone: "text-foreground" },
     {
       label: "Net RR",
-      value: `${stats.totalRR > 0 ? "+" : ""}${stats.totalRR}R`,
+      value: rrRatio ?? stats.totalRRRatio ?? `${stats.totalRR > 0 ? "+" : ""}${stats.totalRR}R`,
       tone: stats.totalRR >= 0 ? "text-emerald-400" : "text-rose-400",
     },
   ];

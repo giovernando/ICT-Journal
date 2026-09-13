@@ -2,7 +2,7 @@
 
 /** Only digits, dot, minus and ratio separator are allowed in the RR input. */
 export function sanitizeRRInput(raw: string): string {
-  return raw.replace(/[^0-9.:-]/g, "");
+  return raw.replace(/[^0-9.,:-]/g, "");
 }
 
 /** Round to 2 decimals, keeping -0 out of the data. */
@@ -21,7 +21,7 @@ const RATIO = /^(-?)(\d+(?:\.\d+)?)\s*:\s*(-?\d+(?:\.\d+)?)$/;
 const PLAIN = /^-?\d+(?:\.\d+)?$/;
 
 export function parseRRInput(raw: string): RRParseResult {
-  const value = raw.trim().replace(",", ".");
+  const value = raw.trim().replace(/,/g, ".");
   if (!value) return { value: null };
 
   if (value.includes(":")) {
@@ -32,7 +32,7 @@ export function parseRRInput(raw: string): RRParseResult {
     const risk = Number(match[2]);
     const reward = Number(match[3]);
     if (!risk) return { value: null, error: "Bagian risk tidak boleh 0 (contoh: 1:2)" };
-    const signed = (match[1] === "-" ? -1 : 1) * (reward / risk);
+    const signed = (match[1] === "-" ? -1 : 1) * reward;
     return { value: normalizeRR(signed) };
   }
 

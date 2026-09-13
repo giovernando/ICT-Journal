@@ -13,12 +13,13 @@ export function rrTone(rr: number | null): string {
 
 interface RRValueProps {
   rr: number | null;
+  ratio?: string | null;
   className?: string;
   /** Show a Loss/BE/Profit label next to the value */
   withLabel?: boolean;
 }
 
-export function RRValue({ rr, className, withLabel = false }: RRValueProps) {
+export function RRValue({ rr, ratio, className, withLabel = false }: RRValueProps) {
   const label = rr === null ? null : rr > 0 ? "profit" : rr < 0 ? "loss" : "BE";
   return (
     <span
@@ -29,7 +30,7 @@ export function RRValue({ rr, className, withLabel = false }: RRValueProps) {
         className,
       )}
     >
-      {formatRR(rr)}
+      {ratio && rr !== null && rr > 0 ? ratio : formatRR(rr)}
       {withLabel && label ? (
         <span className="rounded-md border border-current/30 bg-current/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
           {label}

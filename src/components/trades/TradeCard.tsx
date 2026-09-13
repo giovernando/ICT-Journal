@@ -48,7 +48,7 @@ export function TradeCard({ trade, onEdit, onDelete, number }: TradeCardProps) {
         <Badge>{trade.killzone}</Badge>
         <Badge className="gap-1.5">
           <span className="text-muted-foreground">RR</span>
-          <RRValue rr={trade.rr} className="text-[11px]" />
+          <RRValue rr={trade.rr} ratio={trade.rrRatio} className="text-[11px]" />
         </Badge>
       </div>
 

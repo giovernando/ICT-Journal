@@ -1,4 +1,5 @@
 import type { Trade } from "@/types/trade";
+import { parseRRInput } from "@/lib/rr";
 
 export interface BucketStats {
   key: string;
@@ -8,6 +9,7 @@ export interface BucketStats {
   losses: number;
   winRate: number;
   netRR: number;
+  netRRRatio: string | null;
   avgRR: number;
   /** Sum of realised profit/loss in the currency the caller filtered on */
   netPnl: number;
@@ -16,10 +18,10 @@ export interface BucketStats {
 /** RR contribution of a single trade (loss counts as -1R when RR is positive). */
 export function tradeRR(trade: Trade): number | null {
   if (trade.status === "Running") return null;
-  if (trade.rr === null) return null;
-  if (trade.status === "Lose") return trade.rr < 0 ? trade.rr : -1;
-  if (trade.status === "Win") return trade.rr;
-  return trade.rr;
+  const storedRR = trade.rrRatio ? parseRRInput(trade.rrRatio).value : trade.rr;
+  if (storedRR === null || storedRR === undefined) return null;
+  if (trade.status === "Lose") return storedRR < 0 ? storedRR : -1;
+  return storedRR;
 }
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
@@ -79,6 +81,7 @@ export function summarize(key: string, label: string, items: Trade[]): BucketSta
     losses,
     winRate: decided ? Math.round((wins / decided) * 100) : 0,
     netRR: round2(netRR),
+      netRRRatio: items.length === 1 ? items[0]?.rrRatio ?? null : null,
     avgRR: rrs.length ? round2(netRR / rrs.length) : 0,
     netPnl: round2(items.reduce((sum, t) => sum + (Number(t.pnl) || 0), 0)),
   };

@@ -167,7 +167,7 @@ export function CalendarPage() {
                                   {day.trades} trade
                                 </p>
                                 <div title={RR_TOOLTIP} className="mt-1">
-                                  <RRValue rr={day.rr} className="text-[10px]" />
+                                  <RRValue rr={day.rr} ratio={day.rrRatio} className="text-[10px]" />
                                 </div>
                               </>
                             ) : (
@@ -192,7 +192,7 @@ export function CalendarPage() {
                           </p>
                           <p className="text-[10px] text-muted-foreground">{week.trades} trade</p>
                           <div title={RR_TOOLTIP} className="mt-1">
-                            <RRValue rr={week.rr} className="text-[10px]" />
+                            <RRValue rr={week.rr} ratio={week.rrRatio} className="text-[10px]" />
                           </div>
                         </div>
                       </div>
