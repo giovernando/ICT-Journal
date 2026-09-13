@@ -16,14 +16,14 @@ export function useTradeForm({ initial, onSubmit }: Options) {
     initial ? stripMeta(initial) : emptyTradeDraft(),
   );
   const [errors, setErrors] = useState<TradeFormErrors>({});
-  const [rrInput, setRrInput] = useState(() => rrToInput(initial?.rr));
+  const [rrInput, setRrInput] = useState(() => initial?.rrRatio ?? rrToInput(initial?.rr));
   const [pnlInput, setPnlInput] = useState(() =>
     initial?.pnl ? String(initial.pnl) : "",
   );
 
   useEffect(() => {
     setDraft(initial ? stripMeta(initial) : emptyTradeDraft());
-    setRrInput(rrToInput(initial?.rr));
+    setRrInput(initial?.rrRatio ?? rrToInput(initial?.rr));
     setPnlInput(initial?.pnl ? String(initial.pnl) : "");
     setErrors({});
   }, [initial]);
@@ -38,7 +38,11 @@ export function useTradeForm({ initial, onSubmit }: Options) {
     const clean = sanitizeRRInput(raw);
     setRrInput(clean);
     const { value, error } = parseRRInput(clean);
-    setDraft((prev) => ({ ...prev, rr: value }));
+    setDraft((prev) => ({
+      ...prev,
+      rr: value,
+      rrRatio: value !== null && clean.includes(":") ? clean : null,
+    }));
     setErrors((prev) => ({ ...prev, rr: error }));
   }, []);
 
@@ -96,7 +100,12 @@ export function useTradeForm({ initial, onSubmit }: Options) {
   const isEditing = useMemo(() => Boolean(initial), [initial]);
 
   const rrPreview = useMemo(
-    () => (rrInput.trim() && draft.rr !== null ? formatRRValue(draft.rr) : null),
+    () =>
+      rrInput.trim() && draft.rr !== null
+        ? rrInput.includes(":")
+          ? rrInput
+          : formatRRValue(draft.rr)
+        : null,
     [rrInput, draft.rr],
   );
 

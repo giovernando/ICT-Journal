@@ -111,6 +111,7 @@ export function emptyTradeDraft(): TradeDraft {
     quartal: "Q1",
     raid: "",
     rr: null,
+    rrRatio: null,
     pnl: 0,
     currency: "USD",
     screenshot: null,

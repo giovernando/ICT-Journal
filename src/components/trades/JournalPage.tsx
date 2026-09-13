@@ -38,6 +38,7 @@ function computeFilteredRR(trades: Trade[]) {
     running,
     winRate: decided ? Math.round((wins / decided) * 100) : 0,
     netRR: Math.round(netRR * 100) / 100,
+    netRRRatio: trades.length === 1 ? trades[0]?.rrRatio ?? null : null,
   };
 }
 
@@ -101,7 +102,14 @@ export function JournalPage() {
           {!journal.hydrated ? (
             <SummaryTilesSkeleton />
           ) : (
-            <StatsBar stats={journal.stats} />
+            <StatsBar
+              stats={journal.stats}
+              rrRatio={
+                journal.stats.total === journal.filteredTrades.length
+                  ? filteredSummary.netRRRatio
+                  : null
+              }
+            />
           )}
         </div>
 
@@ -166,7 +174,6 @@ export function JournalPage() {
                 {journal.period === "Custom" && (
                   <div className="grid gap-2 sm:grid-cols-2">
                     <Input
-                      type="date"
                       aria-label="Dari tanggal"
                       value={journal.dateFrom}
                       onChange={(e) => journal.setDateFrom(e.target.value)}
@@ -232,7 +239,11 @@ export function JournalPage() {
                   <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                     Net RR
                   </p>
-                  <RRValue rr={filteredSummary.netRR} className="mt-0.5 text-lg" />
+                   <RRValue
+                     rr={filteredSummary.netRR}
+                     ratio={filteredSummary.netRRRatio}
+                     className="mt-0.5 text-lg"
+                   />
                 </div>
               </div>
                 </>

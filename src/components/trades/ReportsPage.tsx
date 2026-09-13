@@ -178,7 +178,7 @@ export function ReportsPage() {
             <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
               Net P/L
             </p>
-            <RRValue rr={total.netRR} withLabel className="mt-0.5 text-lg" />
+            <RRValue rr={total.netRR} ratio={total.netRRRatio} withLabel className="mt-0.5 text-lg" />
           </div>
           <div
             title={RR_TOOLTIP}
@@ -396,7 +396,7 @@ export function ReportsPage() {
                             {moneyLabel(b.netPnl)}
                           </td>
                           <td className="py-2 pr-3">
-                            <RRValue rr={b.netRR} />
+                            <RRValue rr={b.netRR} ratio={b.netRRRatio} />
                           </td>
                           <td className="py-2 pr-3">
                             <RRValue rr={b.avgRR} />
@@ -489,7 +489,7 @@ export function ReportsPage() {
                             {moneyLabel(p.netPnl)}
                           </td>
                           <td className="py-2 pr-3">
-                            <RRValue rr={p.netRR} />
+                            <RRValue rr={p.netRR} ratio={p.netRRRatio} />
                           </td>
                           <td className="py-2 pr-3">
                             <RRValue rr={p.avgRR} />
@@ -543,7 +543,7 @@ function HighlightTile({
   bucket,
 }: {
   label: string;
-  bucket: { label: string; netRR: number; trades: number } | null;
+  bucket: { label: string; netRR: number; netRRRatio: string | null; trades: number } | null;
 }) {
   if (!bucket) return null;
   return (
@@ -553,7 +553,7 @@ function HighlightTile({
       </p>
       <div className="mt-1 flex items-center justify-between gap-2">
         <span className="text-sm font-medium">{bucket.label}</span>
-        <RRValue rr={bucket.netRR} withLabel />
+        <RRValue rr={bucket.netRR} ratio={bucket.netRRRatio} withLabel />
       </div>
       <p className="mt-0.5 text-xs text-muted-foreground">{bucket.trades} trade</p>
     </div>

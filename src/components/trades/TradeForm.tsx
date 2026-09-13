@@ -162,7 +162,7 @@ export function TradeForm({ initial, onSubmit, onCancel }: TradeFormProps) {
           hint={
             form.rrPreview
               ? `Tersimpan sebagai ${form.rrPreview}`
-              : "Hanya angka, titik, minus, dan ':'"
+              : "Gunakan titik/koma desimal dan ':' untuk rasio"
           }
         >
           <div className="space-y-2">
@@ -178,7 +178,7 @@ export function TradeForm({ initial, onSubmit, onCancel }: TradeFormProps) {
                 className={errors.rr ? "border-rose-500/60 focus:border-rose-500/60 pr-11" : "pr-11"}
                 onChange={(e) => form.setRR(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key.length === 1 && !/[0-9.:-]/.test(e.key) && !e.metaKey && !e.ctrlKey) {
+                  if (e.key.length === 1 && !/[0-9.,:-]/.test(e.key) && !e.metaKey && !e.ctrlKey) {
                     e.preventDefault();
                   }
                 }}

@@ -30,6 +30,7 @@ export interface TradeStats {
   running: number;
   winRate: number;
   totalRR: number;
+  totalRRRatio: string | null;
 }
 
 export type PeriodFilter = "All" | "Today" | "This week" | "This month" | "Custom";
@@ -105,14 +106,25 @@ export function useTrades() {
   }, []);
 
   const addTrade = useCallback(async (draft: TradeDraft) => {
-    const trade = await insertTrade(draft);
-    setTrades((prev) => [trade, ...prev]);
-    return trade;
+    try {
+      const trade = await insertTrade(draft);
+      setTrades((prev) => [trade, ...prev]);
+      setError(null);
+      return trade;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Gagal menyimpan trade");
+      return undefined;
+    }
   }, []);
 
   const updateTrade = useCallback(async (id: string, draft: TradeDraft) => {
-    const trade = await updateTradeRow(id, draft);
-    setTrades((prev) => prev.map((t) => (t.id === id ? trade : t)));
+    try {
+      const trade = await updateTradeRow(id, draft);
+      setTrades((prev) => prev.map((t) => (t.id === id ? trade : t)));
+      setError(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Gagal memperbarui trade");
+    }
   }, []);
 
   const removeTrade = useCallback(async (id: string) => {
@@ -192,6 +204,7 @@ export function useTrades() {
       running,
       winRate: decided ? Math.round((wins / decided) * 100) : 0,
       totalRR: Math.round(totalRR * 100) / 100,
+      totalRRRatio: trades.length === 1 ? trades[0]?.rrRatio ?? null : null,
     };
   }, [trades]);
 

@@ -27,6 +27,8 @@ export interface Trade {
   raid: string;
   /** Reward multiple, e.g. 2 means 1:2 */
   rr: number | null;
+  /** Original ratio text entered by the user, e.g. "2:4" */
+  rrRatio: string | null;
   /** Realised profit/loss in `currency` (negative = loss) */
   pnl: number;
   currency: Currency;

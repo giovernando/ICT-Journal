@@ -93,7 +93,7 @@ export function TradeTable({
                 <Badge tone={STATUS_TONE[trade.status]}>{trade.status}</Badge>
               </td>
               <td className="whitespace-nowrap border-b border-border/40 px-3 py-3 text-xs">
-                <RRValue rr={trade.rr} />
+                <RRValue rr={trade.rr} ratio={trade.rrRatio} />
               </td>
 
               <td
