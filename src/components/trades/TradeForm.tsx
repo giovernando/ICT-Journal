@@ -56,8 +56,15 @@ function SuggestionInput({
     const close = (event: PointerEvent) => {
       if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
     };
-    document.addEventListener("pointerdown", close);
-    return () => document.removeEventListener("pointerdown", close);
+    const closeWithEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("pointerdown", close, true);
+    document.addEventListener("keydown", closeWithEscape);
+    return () => {
+      document.removeEventListener("pointerdown", close, true);
+      document.removeEventListener("keydown", closeWithEscape);
+    };
   }, []);
 
   return (
@@ -92,7 +99,7 @@ function SuggestionInput({
         <ChevronDown className="h-4 w-4" />
       </button>
       {open && visibleOptions.length > 0 ? (
-        <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-56 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl shadow-black/20">
+        <div className="dropdown-scroll absolute left-0 right-0 top-full z-50 mt-2 max-h-56 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl shadow-black/20">
           {visibleOptions.map((option) => (
             <button
               key={option}
@@ -107,6 +114,14 @@ function SuggestionInput({
               {option}
             </button>
           ))}
+          {options.length > 6 ? (
+            <div
+              aria-hidden="true"
+              className="pointer-events-none sticky bottom-0 -mb-1 flex h-7 items-end justify-center bg-gradient-to-t from-white via-white/90 to-transparent pb-0.5 text-slate-400 sm:hidden"
+            >
+              <ChevronDown className="h-4 w-4" />
+            </div>
+          ) : null}
         </div>
       ) : null}
     </div>
