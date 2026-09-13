@@ -22,7 +22,7 @@ import { tradeRR } from "@/lib/reports";
 import { STATUS_OPTIONS } from "@/lib/trade-options";
 import type { Trade, TradeStatus } from "@/types/trade";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 9;
 
 
 function computeFilteredRR(trades: Trade[]) {
