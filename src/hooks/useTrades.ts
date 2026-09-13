@@ -6,6 +6,7 @@ import {
   insertTrades,
   updateTradeRow,
 } from "@/lib/trades-repo";
+import { tradeRR } from "@/lib/reports";
 import type { Trade, TradeDraft, TradeStatus } from "@/types/trade";
 
 const STORAGE_KEY = "trading-journal:trades:v1";
@@ -183,12 +184,7 @@ export function useTrades() {
     const losses = trades.filter((t) => t.status === "Lose").length;
     const running = trades.filter((t) => t.status === "Running").length;
     const decided = wins + losses;
-    const totalRR = trades.reduce((sum, t) => {
-      if (t.rr === null) return sum;
-      if (t.status === "Win") return sum + t.rr;
-      if (t.status === "Lose") return sum - 1;
-      return sum;
-    }, 0);
+    const totalRR = trades.reduce((sum, trade) => sum + (tradeRR(trade) ?? 0), 0);
     return {
       total: trades.length,
       wins,

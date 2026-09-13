@@ -18,6 +18,7 @@ import { TradeForm } from "@/components/trades/TradeForm";
 import { TradeTable } from "@/components/trades/TradeTable";
 import { useTrades, type PeriodFilter } from "@/hooks/useTrades";
 import { formatTotals, totalsTone } from "@/lib/money";
+import { tradeRR } from "@/lib/reports";
 import { STATUS_OPTIONS } from "@/lib/trade-options";
 import type { Trade, TradeStatus } from "@/types/trade";
 
@@ -29,12 +30,7 @@ function computeFilteredRR(trades: Trade[]) {
   const losses = trades.filter((t) => t.status === "Lose").length;
   const running = trades.filter((t) => t.status === "Running").length;
   const decided = wins + losses;
-  const netRR = trades.reduce((sum, t) => {
-    if (t.rr === null) return sum;
-    if (t.status === "Win") return sum + t.rr;
-    if (t.status === "Lose") return sum - 1;
-    return sum;
-  }, 0);
+  const netRR = trades.reduce((sum, trade) => sum + (tradeRR(trade) ?? 0), 0);
   return {
     count: trades.length,
     wins,
