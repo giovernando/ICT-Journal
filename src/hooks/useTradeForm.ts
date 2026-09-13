@@ -86,7 +86,13 @@ export function useTradeForm({ initial, onSubmit }: Options) {
     const next = validate();
     setErrors(next);
     if (Object.keys(next).length > 0) return false;
-    onSubmit({ ...draft, pair: draft.pair.trim().toUpperCase() });
+    onSubmit({
+      ...draft,
+      pair: draft.pair.trim().toUpperCase(),
+      killzone: draft.killzone || "London Open",
+      quartal: draft.quartal || "Q1",
+      currency: draft.currency || "USD",
+    });
     return true;
   }, [draft, onSubmit, validate]);
 

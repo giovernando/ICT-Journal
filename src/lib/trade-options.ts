@@ -1,5 +1,5 @@
 import { formatRRValue } from "@/lib/rr";
-import type { Bias, Killzone, Position, Quartal, TradeDraft, TradeStatus } from "@/types/trade";
+import type { Bias, Currency, Killzone, Position, Quartal, TradeDraft, TradeStatus } from "@/types/trade";
 
 export const BIAS_OPTIONS: Bias[] = ["Bullish", "Bearish"];
 export const POSITION_OPTIONS: Position[] = ["Long", "Short"];
@@ -12,7 +12,7 @@ export const KILLZONE_OPTIONS: Killzone[] = [
   "London Close",
   "Silver Bullet",
 ];
-export const QUARTAL_OPTIONS: Quartal[] = ["Q1", "Q2", "Q3"];
+export const QUARTAL_OPTIONS: Quartal[] = ["Q1", "Q2", "Q3", "Q4"];
 export const ENTRY_MODEL_OPTIONS = [
   "BRK",
   "FVG",
@@ -23,6 +23,8 @@ export const ENTRY_MODEL_OPTIONS = [
   "OB",
   "After MSS",
   "IFVG",
+  "MSS",
+  "ChoCH",
   "Silver Bulet",
   "TS",
   "CISD",
@@ -48,6 +50,7 @@ export const RAID_OPTIONS = [
   "SMT",
   "SMT FILL",
 ];
+export const DOL_OPTIONS = RAID_OPTIONS.filter((option) => option !== "SMT" && option !== "SMT FILL");
 export const DOL_SUGGESTIONS = [
   "Daily High",
   "Daily Low",
@@ -104,16 +107,16 @@ export function emptyTradeDraft(): TradeDraft {
     pair: "",
     bias: "Bullish",
     dol: "",
-    entryModel: "FVG",
-    killzone: "London Open",
+    entryModel: "",
+    killzone: "" as Killzone,
     position: "Long",
     status: "Running",
-    quartal: "Q1",
+    quartal: "" as Quartal,
     raid: "",
     rr: null,
     rrRatio: null,
     pnl: 0,
-    currency: "USD",
+    currency: "" as Currency,
     screenshot: null,
     notes: "",
   };

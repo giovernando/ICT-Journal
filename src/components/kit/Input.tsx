@@ -58,11 +58,11 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     <div className="relative">
       <select
         ref={ref}
-        className={cn(base, "h-11 cursor-pointer appearance-none pr-9", className)}
+        className={cn(base, "h-11 cursor-pointer appearance-none pr-9 [color-scheme:light]", className)}
         {...props}
       >
         {options.map((option) => (
-          <option key={option} value={option} className="bg-[#0d1117] text-foreground">
+          <option key={option} value={option} className="bg-white text-slate-900">
             {option}
           </option>
         ))}

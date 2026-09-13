@@ -2,7 +2,7 @@ export type Bias = "Bullish" | "Bearish";
 export type Position = "Long" | "Short";
 export type TradeStatus = "Win" | "Lose" | "Running" | "Close" | "SL+" | "BE";
 export type Currency = "IDR" | "USD" | "USC";
-export type Quartal = "Q1" | "Q2" | "Q3";
+export type Quartal = "Q1" | "Q2" | "Q3" | "Q4";
 export type Killzone =
   | "Asian"
   | "London Open"

@@ -1,14 +1,15 @@
-import { useId } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/components/kit/Button";
 import { Field } from "@/components/kit/Field";
-import { Input, Select, Textarea } from "@/components/kit/Input";
+import { Input, Textarea } from "@/components/kit/Input";
+import { ChevronDown } from "lucide-react";
 import { ChoiceGroup } from "@/components/trades/ChoiceGroup";
 import { useTradeForm } from "@/hooks/useTradeForm";
 import { CURRENCY_OPTIONS } from "@/lib/money";
 import {
   BIAS_OPTIONS,
   BIAS_TONE,
-  DOL_SUGGESTIONS,
+  DOL_OPTIONS,
   ENTRY_MODEL_OPTIONS,
   KILLZONE_OPTIONS,
   POSITION_OPTIONS,
@@ -30,6 +31,87 @@ const RR_EXAMPLES = [
   { label: "-1 (SL)", value: "-1", tone: "border-rose-500/25 bg-rose-500/10 text-rose-400" },
   { label: "0 (BE)", value: "0", tone: "border-border/70 bg-card/50 text-muted-foreground" },
 ] as const;
+
+function SuggestionInput({
+  id,
+  value,
+  options,
+  placeholder,
+  onChange,
+}: {
+  id: string;
+  value: string;
+  options: readonly string[];
+  placeholder?: string;
+  onChange: (value: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [showAll, setShowAll] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const visibleOptions = showAll
+    ? options
+    : options.filter((option) => option.toLowerCase().includes(value.toLowerCase()));
+
+  useEffect(() => {
+    const close = (event: PointerEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
+  }, []);
+
+  return (
+    <div ref={rootRef} className="relative">
+      <Input
+        id={id}
+        value={value}
+        placeholder={placeholder}
+        autoComplete="off"
+        className="pr-10"
+        onFocus={() => {
+          setShowAll(true);
+          setOpen(true);
+        }}
+        onChange={(event) => {
+          setShowAll(false);
+          setOpen(true);
+          onChange(event.target.value);
+        }}
+      />
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-label="Buka pilihan"
+        onMouseDown={(event) => event.preventDefault()}
+        onClick={() => {
+          setShowAll(true);
+          setOpen((current) => !current);
+        }}
+        className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center text-muted-foreground"
+      >
+        <ChevronDown className="h-4 w-4" />
+      </button>
+      {open && visibleOptions.length > 0 ? (
+        <div className="absolute left-0 right-0 top-full z-50 mt-2 max-h-56 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl shadow-black/20">
+          {visibleOptions.map((option) => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => {
+                onChange(option);
+                setOpen(false);
+                setShowAll(false);
+              }}
+              className="block w-full rounded-lg px-3 py-2 text-left text-sm text-slate-900 transition-colors hover:bg-slate-100"
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 interface TradeFormProps {
   initial?: Trade | null;
@@ -113,45 +195,34 @@ export function TradeForm({ initial, onSubmit, onCancel }: TradeFormProps) {
           htmlFor={fid("dol")}
           hint="Misal: Daily High, Previous Session Low"
         >
-          <Input
+          <SuggestionInput
             id={fid("dol")}
-            list={fid("dol-list")}
             value={draft.dol}
-            placeholder="Previous Session Low"
-            onChange={(e) => form.setField("dol", e.target.value)}
+            options={DOL_OPTIONS}
+            placeholder="PDH/L"
+            onChange={(value) => form.setField("dol", value)}
           />
-          <datalist id={fid("dol-list")}>
-            {DOL_SUGGESTIONS.map((s) => (
-              <option key={s} value={s} />
-            ))}
-          </datalist>
         </Field>
 
         <Field label="Entry Model" htmlFor={fid("entryModel")} error={errors.entryModel}>
-          <Input
+          <SuggestionInput
             id={fid("entryModel")}
-            list={fid("model-list")}
             value={draft.entryModel}
-            placeholder="FVG Rejection"
-            onChange={(e) => form.setField("entryModel", e.target.value)}
+            options={ENTRY_MODEL_OPTIONS}
+            placeholder="FVG"
+            onChange={(value) => form.setField("entryModel", value)}
           />
-          <datalist id={fid("model-list")}>
-            {ENTRY_MODEL_OPTIONS.map((s) => (
-              <option key={s} value={s} />
-            ))}
-          </datalist>
         </Field>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Killzone" htmlFor={fid("killzone")}>
-          <Select
+          <SuggestionInput
             id={fid("killzone")}
-            options={KILLZONE_OPTIONS}
             value={draft.killzone}
-            onChange={(e) =>
-              form.setField("killzone", e.target.value as (typeof KILLZONE_OPTIONS)[number])
-            }
+            options={KILLZONE_OPTIONS}
+            placeholder="Asian"
+            onChange={(value) => form.setField("killzone", value as (typeof KILLZONE_OPTIONS)[number])}
           />
         </Field>
 
@@ -223,11 +294,12 @@ export function TradeForm({ initial, onSubmit, onCancel }: TradeFormProps) {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Quartal" htmlFor={fid("quartal")}>
-          <Select
+          <SuggestionInput
             id={fid("quartal")}
-            options={QUARTAL_OPTIONS}
             value={draft.quartal}
-            onChange={(e) => form.setField("quartal", e.target.value as Quartal)}
+            options={QUARTAL_OPTIONS}
+            placeholder="Q1"
+            onChange={(value) => form.setField("quartal", value as Quartal)}
           />
         </Field>
 
@@ -236,19 +308,13 @@ export function TradeForm({ initial, onSubmit, onCancel }: TradeFormProps) {
           htmlFor={fid("raid")}
           hint="Misal: Monday H/L, PDH/L, SMT"
         >
-          <Input
+          <SuggestionInput
             id={fid("raid")}
-            list={fid("raid-list")}
             value={draft.raid}
+            options={RAID_OPTIONS}
             placeholder="PDH/L"
-            autoComplete="off"
-            onChange={(e) => form.setField("raid", e.target.value)}
+            onChange={(value) => form.setField("raid", value)}
           />
-          <datalist id={fid("raid-list")}>
-            {RAID_OPTIONS.map((s) => (
-              <option key={s} value={s} />
-            ))}
-          </datalist>
         </Field>
       </div>
 
@@ -284,11 +350,12 @@ export function TradeForm({ initial, onSubmit, onCancel }: TradeFormProps) {
           </div>
         </Field>
         <Field label="Mata Uang" htmlFor={fid("currency")}>
-          <Select
+          <SuggestionInput
             id={fid("currency")}
-            options={CURRENCY_OPTIONS}
             value={draft.currency}
-            onChange={(e) => form.setField("currency", e.target.value as Currency)}
+            options={CURRENCY_OPTIONS}
+            placeholder="USD"
+            onChange={(value) => form.setField("currency", value as Currency)}
           />
         </Field>
       </div>
