@@ -2,7 +2,13 @@ import { Link } from "@tanstack/react-router";
 import { BarChart3, CalendarDays, Plus } from "lucide-react";
 
 const itemClass =
-  "flex flex-1 flex-col items-center gap-1 py-2 text-[11px] font-semibold transition-colors";
+  "flex flex-1 flex-col items-center gap-1 py-2 text-[11px] font-semibold transition-[color,transform] duration-200 ease-out active:scale-95";
+
+function triggerHaptic() {
+  if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+    navigator.vibrate(12);
+  }
+}
 
 export function BottomNav({ onNewTrade }: { onNewTrade?: () => void }) {
   return (
@@ -10,8 +16,9 @@ export function BottomNav({ onNewTrade }: { onNewTrade?: () => void }) {
       <div className="mx-auto flex w-full max-w-6xl items-end justify-between gap-2 px-4 pb-[env(safe-area-inset-bottom)] sm:px-6">
         <Link
           to="/reports"
+          onClick={triggerHaptic}
           className={itemClass}
-          activeProps={{ className: `${itemClass} text-primary` }}
+          activeProps={{ className: `${itemClass} text-primary scale-[1.03]` }}
           inactiveProps={{ className: `${itemClass} text-muted-foreground hover:text-foreground` }}
         >
           <BarChart3 className="h-5 w-5" />
@@ -22,17 +29,21 @@ export function BottomNav({ onNewTrade }: { onNewTrade?: () => void }) {
           {onNewTrade ? (
             <button
               type="button"
-              onClick={onNewTrade}
-              className="-mt-3 flex flex-col items-center gap-1 text-[11px] font-semibold text-foreground"
+              onClick={() => {
+                triggerHaptic();
+                onNewTrade();
+              }}
+              className="group -mt-3 flex flex-col items-center gap-1 text-[11px] font-semibold text-foreground"
             >
               <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-b from-primary to-primary/85 text-primary-foreground shadow-[0_10px_30px_-12px_var(--glow)]">
-                <Plus className="h-6 w-6" />
+                <Plus className="h-6 w-6 transition-transform duration-200 group-active:rotate-90" />
               </span>
               Trade baru
             </button>
           ) : (
             <Link
               to="/"
+              onClick={triggerHaptic}
               className="-mt-3 flex flex-col items-center gap-1 text-[11px] font-semibold text-foreground"
             >
               <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-b from-primary to-primary/85 text-primary-foreground shadow-[0_10px_30px_-12px_var(--glow)]">
@@ -45,8 +56,9 @@ export function BottomNav({ onNewTrade }: { onNewTrade?: () => void }) {
 
         <Link
           to="/calendar"
+          onClick={triggerHaptic}
           className={itemClass}
-          activeProps={{ className: `${itemClass} text-primary` }}
+          activeProps={{ className: `${itemClass} text-primary scale-[1.03]` }}
           inactiveProps={{ className: `${itemClass} text-muted-foreground hover:text-foreground` }}
         >
           <CalendarDays className="h-5 w-5" />

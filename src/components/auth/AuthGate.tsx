@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { LogOut } from "lucide-react";
+import { ArrowUpRight, BarChart3, Check, LogOut, ShieldCheck } from "lucide-react";
 
 import { Button } from "@/components/kit/Button";
 import { Card, CardBody, CardHeader } from "@/components/kit/Card";
@@ -50,75 +50,147 @@ function AuthScreen() {
         if (err) throw err;
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Gagal memproses permintaan");
+      const message = e instanceof Error ? e.message : "Gagal memproses permintaan";
+      setError(
+        message.toLowerCase().includes("invalid login credentials")
+          ? "Kamu belum memiliki akun, daftar terlebih dahulu."
+          : message,
+      );
     } finally {
       setBusy(false);
     }
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10">
-      <div className="pointer-events-none absolute inset-x-0 -top-40 h-96 bg-[radial-gradient(60%_60%_at_50%_0%,var(--glow),transparent)]" />
-      <Card className="relative w-full max-w-sm">
-        <CardHeader
-          title={mode === "signin" ? "Masuk ke Journal" : "Buat Akun Baru"}
-          description="Data trade kamu privat — hanya bisa dilihat oleh akun kamu sendiri."
-        />
-        <CardBody>
-          <p className="mb-4 rounded-xl border border-primary/20 bg-primary/5 px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
-            Email tidak harus aktif. Kamu bebas menggunakan alamat email apa saja selama formatnya valid.
-          </p>
-          <form className="grid gap-4" onSubmit={submit}>
-            <Field label="Email">
-              <Input
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="kamu@email.com"
-              />
-            </Field>
-            <Field label="Password">
-              <PasswordInput
-                autoComplete={mode === "signin" ? "current-password" : "new-password"}
-                required
-                minLength={6}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Minimal 6 karakter"
-              />
-            </Field>
-
-            {error && (
-              <p className="rounded-xl border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive">
-                {error}
+    <div className="relative min-h-screen overflow-hidden bg-background px-4 py-6 text-foreground sm:px-8 sm:py-8">
+      <img
+        src="/trading-chart-bg.svg"
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 h-full w-full object-fill opacity-55"
+      />
+      <div className="pointer-events-none absolute inset-0 bg-background/45" />
+      <div className="relative mx-auto grid min-h-[calc(100vh-3rem)] w-full max-w-6xl overflow-hidden rounded-[1.75rem] border border-border/70 bg-card/20 shadow-2xl shadow-black/20 lg:grid-cols-[1.1fr_0.9fr]">
+        <section className="relative hidden overflow-hidden border-r border-border/60 bg-[#0c141b]/55 p-10 lg:flex lg:flex-col lg:justify-between xl:p-14">
+          <div className="relative">
+            <div className="flex items-center gap-3 text-sm font-semibold tracking-tight">
+              <span className="grid h-9 w-9 place-items-center rounded-xl border border-emerald-400/30 bg-emerald-400/10 text-emerald-300">
+                <BarChart3 className="h-4 w-4" />
+              </span>
+              ICT Journal
+            </div>
+            <div className="mt-24 max-w-lg">
+              <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300/80">
+                Trade with intention
               </p>
-            )}
-            {info && (
-              <p className="rounded-xl border border-primary/30 bg-primary/10 px-3 py-2 text-xs text-primary">
-                {info}
+              <h1 className="text-4xl font-semibold leading-[1.08] tracking-tight text-white xl:text-5xl">
+                Review every trade. Improve every edge.
+              </h1>
+              <p className="mt-5 max-w-md text-sm leading-6 text-slate-400">
+                Satu ruang tenang untuk mencatat setup, membaca hasil, dan membangun disiplin trading.
               </p>
-            )}
+            </div>
+          </div>
+          <div className="relative grid max-w-md grid-cols-2 gap-3">
+            <div className="rounded-2xl border border-border/60 bg-black/20 p-4">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">Workspace</p>
+              <p className="mt-2 text-lg font-semibold text-white">Private by default</p>
+              <ShieldCheck className="mt-5 h-5 w-5 text-emerald-300" />
+            </div>
+            <div className="rounded-2xl border border-border/60 bg-black/20 p-4">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">Focus</p>
+              <p className="mt-2 text-lg font-semibold text-white">Process over noise</p>
+              <ArrowUpRight className="mt-5 h-5 w-5 text-emerald-300" />
+            </div>
+          </div>
+        </section>
 
-            <Button type="submit" disabled={busy}>
-              {busy ? "Memproses…" : mode === "signin" ? "Masuk" : "Daftar"}
-            </Button>
+        <section className="relative flex items-center justify-center bg-background/10 p-5 sm:p-10">
+          <div className="w-full max-w-sm">
+            <div className="mb-8 flex items-center gap-3 lg:hidden">
+              <span className="grid h-9 w-9 place-items-center rounded-xl border border-emerald-400/30 bg-emerald-400/10 text-emerald-300">
+                <BarChart3 className="h-4 w-4" />
+              </span>
+              <span className="font-semibold tracking-tight">ICT Journal</span>
+            </div>
+            <div className="mb-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300/80">Your trading workspace</p>
+              <h2 className="mt-3 text-3xl font-semibold tracking-tight">
+                {mode === "signin" ? "Selamat datang kembali" : "Mulai jurnalmu"}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                {mode === "signin" ? "Masuk dan lanjutkan membaca performamu." : "Buat ruang privat untuk setiap eksekusi."}
+              </p>
+            </div>
+            <Card className="border-border/70 bg-background/25 shadow-xl shadow-black/10 backdrop-blur-[2px]">
+              <CardBody className="p-5 sm:p-6">
+                <form className="grid gap-4" onSubmit={submit}>
+                  <Field label="Email">
+                    <Input
+                      type="email"
+                      autoComplete="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="kamu@email.com"
+                    />
+                  </Field>
+                  <Field label="Password">
+                    <PasswordInput
+                      autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                      required
+                      minLength={6}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Minimal 6 karakter"
+                    />
+                  </Field>
 
-            <button
-              type="button"
-              className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-              onClick={() => {
-                setMode(mode === "signin" ? "signup" : "signin");
-                setError(null);
-                setInfo(null);
-              }}
-            >
-              {mode === "signin" ? "Belum punya akun? Daftar" : "Sudah punya akun? Masuk"}
-            </button>
-          </form>
-        </CardBody>
-      </Card>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className="grid h-4 w-4 place-items-center rounded border border-emerald-400/40 bg-emerald-400/10 text-emerald-300">
+                      <Check className="h-3 w-3" />
+                    </span>
+                    Sesi kamu akan tetap tersimpan di perangkat ini.
+                  </div>
+
+                  <p className="rounded-xl border border-primary/20 bg-primary/5 px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
+                    Email tidak harus aktif. Gunakan alamat apa saja selama formatnya valid.
+                  </p>
+                  {error && (
+                    <p className="rounded-xl border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+                      {error}
+                    </p>
+                  )}
+                  {info && (
+                    <p className="rounded-xl border border-primary/30 bg-primary/10 px-3 py-2 text-xs text-primary">
+                      {info}
+                    </p>
+                  )}
+
+                  <Button type="submit" disabled={busy} className="mt-1 w-full">
+                    {busy ? "Memproses…" : mode === "signin" ? "Masuk ke Journal" : "Buat Akun"}
+                  </Button>
+
+                  <button
+                    type="button"
+                    className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                    onClick={() => {
+                      setMode(mode === "signin" ? "signup" : "signin");
+                      setError(null);
+                      setInfo(null);
+                    }}
+                  >
+                    {mode === "signin" ? "Belum punya akun? Daftar" : "Sudah punya akun? Masuk"}
+                  </button>
+                </form>
+              </CardBody>
+            </Card>
+            <p className="mt-5 text-center text-[11px] text-muted-foreground/70">
+              Data trade kamu privat dan hanya dapat diakses dari akunmu.
+            </p>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
