@@ -12,6 +12,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import { SplashScreen } from "@/components/app/SplashScreen";
+import { InstallPrompt } from "@/components/app/InstallPrompt";
 import { useAuth } from "@/hooks/useAuth";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -140,6 +141,7 @@ function RootComponent() {
       <div key={pathname} className="page-transition">
         <Outlet />
       </div>
+      <InstallPrompt />
       <SplashScreen ready={!loading} />
     </QueryClientProvider>
   );
