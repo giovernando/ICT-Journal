@@ -52,7 +52,7 @@ export function CalendarPage() {
       <div className="pointer-events-none absolute inset-x-0 -top-40 h-96 bg-[radial-gradient(60%_60%_at_50%_0%,var(--glow),transparent)]" />
 
       <div className="relative mx-auto w-full max-w-6xl px-4 pb-24 sm:px-6 sm:pb-24">
-        <TopBar title="Kalender" backTo="/" backLabel="← Journal" />
+        <TopBar title="Kalender" />
         <div className="mt-6">
           <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">
             Profit harian & mingguan

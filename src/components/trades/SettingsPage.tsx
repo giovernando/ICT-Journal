@@ -54,7 +54,7 @@ export function SettingsPage() {
       <div className="pointer-events-none absolute inset-x-0 -top-40 h-96 bg-[radial-gradient(60%_60%_at_50%_0%,var(--glow),transparent)]" />
 
       <div className="relative mx-auto w-full max-w-3xl px-4 pb-28 sm:px-6">
-        <TopBar title="Pengaturan" backTo="/" backLabel="← Journal" />
+        <TopBar title="Pengaturan" />
         <header className="mt-6">
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">
             Pengaturan Akun
