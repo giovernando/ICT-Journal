@@ -135,6 +135,11 @@ function RootComponent() {
   const { loading } = useAuth();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
 
+  useEffect(() => {
+    const savedTheme = window.localStorage.getItem("theme");
+    document.documentElement.classList.toggle("dark", savedTheme !== "light");
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}

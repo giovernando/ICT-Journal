@@ -4,7 +4,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 const base =
-  "w-full rounded-xl border border-border/70 bg-card/50 px-3.5 py-2.5 text-base sm:text-sm text-foreground placeholder:text-muted-foreground/60 backdrop-blur-md shadow-[inset_0_1px_0_0_rgb(255_255_255/0.04)] transition-all duration-200 hover:border-border focus:border-primary/50 focus:bg-card/70 focus:outline-none focus:ring-2 focus:ring-ring/40 [color-scheme:dark]";
+  "w-full rounded-xl border border-border/70 bg-card/50 px-3.5 py-2.5 text-base sm:text-sm text-foreground placeholder:text-muted-foreground/60 backdrop-blur-md shadow-[inset_0_1px_0_0_rgb(255_255_255/0.04)] transition-all duration-200 hover:border-border focus:border-primary/50 focus:bg-card/70 focus:outline-none focus:ring-2 focus:ring-ring/40 [color-scheme:inherit]";
 
 export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(
   ({ className, ...props }, ref) => (
