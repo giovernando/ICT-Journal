@@ -1,5 +1,6 @@
 import { formatRR } from "@/lib/trade-options";
 import { cn } from "@/lib/utils";
+import { CountUp } from "@/components/trades/CountUp";
 
 export const RR_TOOLTIP =
   "RR = reward dibanding risk. 1:2 berarti profit 2x risk. Nilai negatif (mis. -1R) berarti loss/defisit sebesar 1x risk. 0R = break even.";
@@ -17,9 +18,10 @@ interface RRValueProps {
   className?: string;
   /** Show a Loss/BE/Profit label next to the value */
   withLabel?: boolean;
+  animate?: boolean;
 }
 
-export function RRValue({ rr, ratio, className, withLabel = false }: RRValueProps) {
+export function RRValue({ rr, ratio, className, withLabel = false, animate = false }: RRValueProps) {
   const label = rr === null ? null : rr > 0 ? "profit" : rr < 0 ? "loss" : "BE";
   return (
     <span
@@ -30,7 +32,16 @@ export function RRValue({ rr, ratio, className, withLabel = false }: RRValueProp
         className,
       )}
     >
-      {ratio && rr !== null && rr > 0 ? ratio : formatRR(rr)}
+      {animate && rr !== null && !ratio ? (
+        <CountUp
+          value={rr}
+          format={(value) => formatRR(value)}
+        />
+      ) : ratio && rr !== null && rr > 0 ? (
+        ratio
+      ) : (
+        formatRR(rr)
+      )}
       {withLabel && label ? (
         <span className="rounded-md border border-current/30 bg-current/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
           {label}

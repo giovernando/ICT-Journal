@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/kit/Button";
 import { Card, CardBody, CardHeader } from "@/components/kit/Card";
+import { AnimatedMoneyTotals } from "@/components/trades/AnimatedMoneyTotals";
+import { CountUp } from "@/components/trades/CountUp";
 import { Input, Select } from "@/components/kit/Input";
 import { Modal } from "@/components/kit/Modal";
 import { RRValue, RR_TOOLTIP } from "@/components/trades/RRValue";
@@ -17,7 +19,7 @@ import { TradeCard } from "@/components/trades/TradeCard";
 import { TradeForm } from "@/components/trades/TradeForm";
 import { TradeTable } from "@/components/trades/TradeTable";
 import { useTrades, type PeriodFilter } from "@/hooks/useTrades";
-import { formatTotals, totalsTone } from "@/lib/money";
+import { totalsTone } from "@/lib/money";
 import { tradeRR } from "@/lib/reports";
 import { STATUS_OPTIONS } from "@/lib/trade-options";
 import type { Trade, TradeStatus } from "@/types/trade";
@@ -210,25 +212,30 @@ export function JournalPage() {
                 <p
                   className={`mt-1 text-2xl font-semibold tracking-tight ${totalsTone(journal.filteredTrades)}`}
                 >
-                  {formatTotals(journal.filteredTrades)}
+                  <AnimatedMoneyTotals trades={journal.filteredTrades} />
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                {[
-                  { label: "Trade", value: String(filteredSummary.count) },
-                  { label: "Win Rate", value: `${filteredSummary.winRate}%` },
-                  { label: "W/L", value: `${filteredSummary.wins}/${filteredSummary.losses}` },
-                ].map((item) => (
+                {["Trade", "Win Rate", "W/L"].map((label) => (
                   <div
-                    key={item.label}
+                    key={label}
                     className="rounded-xl border border-border/50 bg-card/40 px-3 py-2.5 backdrop-blur-sm"
                   >
                     <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                      {item.label}
+                      {label}
                     </p>
                     <p className="mt-0.5 text-lg font-semibold tracking-tight text-foreground">
-                      {item.value}
+                      {label === "Trade" ? (
+                        <CountUp value={filteredSummary.count} />
+                      ) : label === "Win Rate" ? (
+                        <CountUp value={filteredSummary.winRate} suffix="%" />
+                      ) : (
+                        <>
+                          <CountUp value={filteredSummary.wins} />/
+                          <CountUp value={filteredSummary.losses} />
+                        </>
+                      )}
                     </p>
                   </div>
                 ))}
@@ -239,11 +246,12 @@ export function JournalPage() {
                   <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                     Net RR
                   </p>
-                   <RRValue
-                     rr={filteredSummary.netRR}
-                     ratio={filteredSummary.netRRRatio}
-                     className="mt-0.5 text-lg"
-                   />
+                  <RRValue
+                    rr={filteredSummary.netRR}
+                    ratio={filteredSummary.netRRRatio}
+                    animate
+                    className="mt-0.5 text-lg"
+                  />
                 </div>
               </div>
                 </>
