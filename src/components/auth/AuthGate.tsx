@@ -5,6 +5,7 @@ import { Button } from "@/components/kit/Button";
 import { Card, CardBody, CardHeader } from "@/components/kit/Card";
 import { Input, PasswordInput } from "@/components/kit/Input";
 import { Field } from "@/components/kit/Field";
+import { ThemeToggle } from "@/components/trades/ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -67,11 +68,14 @@ function AuthScreen() {
         src="/trading-chart-bg.svg"
         alt=""
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 h-full w-full object-fill opacity-55"
+        className="pointer-events-none absolute inset-0 h-full w-full object-fill opacity-15 dark:opacity-55"
       />
-      <div className="pointer-events-none absolute inset-0 bg-background/45" />
-      <div className="relative mx-auto grid min-h-[calc(100vh-3rem)] w-full max-w-6xl overflow-hidden rounded-[1.75rem] border border-border/70 bg-card/20 shadow-2xl shadow-black/20 lg:grid-cols-[1.1fr_0.9fr]">
-        <section className="relative hidden overflow-hidden border-r border-border/60 bg-[#0c141b]/55 p-10 lg:flex lg:flex-col lg:justify-between xl:p-14">
+      <div className="pointer-events-none absolute inset-0 bg-background/70 dark:bg-background/45" />
+      <div className="relative mx-auto grid min-h-[calc(100vh-3rem)] w-full max-w-6xl overflow-hidden rounded-[1.75rem] border border-border/70 bg-card/70 shadow-2xl shadow-black/10 dark:bg-card/20 dark:shadow-black/20 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="absolute right-4 top-4 z-20">
+          <ThemeToggle />
+        </div>
+        <section className="relative hidden overflow-hidden border-r border-border/60 bg-card/85 p-10 lg:flex lg:flex-col lg:justify-between dark:bg-[#0c141b]/55 xl:p-14">
           <div className="relative">
             <div className="flex items-center gap-3 text-sm font-semibold tracking-tight">
               <span className="grid h-9 w-9 place-items-center rounded-xl border border-emerald-400/30 bg-emerald-400/10 text-emerald-300">
@@ -83,23 +87,23 @@ function AuthScreen() {
               <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300/80">
                 Trade with intention
               </p>
-              <h1 className="text-4xl font-semibold leading-[1.08] tracking-tight text-white xl:text-5xl">
+              <h1 className="text-4xl font-semibold leading-[1.08] tracking-tight text-foreground dark:text-white xl:text-5xl">
                 Review every trade. Improve every edge.
               </h1>
-              <p className="mt-5 max-w-md text-sm leading-6 text-slate-400">
+              <p className="mt-5 max-w-md text-sm leading-6 text-muted-foreground dark:text-slate-400">
                 Satu ruang tenang untuk mencatat setup, membaca hasil, dan membangun disiplin trading.
               </p>
             </div>
           </div>
           <div className="relative grid max-w-md grid-cols-2 gap-3">
-            <div className="rounded-2xl border border-border/60 bg-black/20 p-4">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">Workspace</p>
-              <p className="mt-2 text-lg font-semibold text-white">Private by default</p>
+            <div className="rounded-2xl border border-border/60 bg-background/60 p-4 dark:bg-black/20">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Workspace</p>
+              <p className="mt-2 text-lg font-semibold text-foreground dark:text-white">Private by default</p>
               <ShieldCheck className="mt-5 h-5 w-5 text-emerald-300" />
             </div>
-            <div className="rounded-2xl border border-border/60 bg-black/20 p-4">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">Focus</p>
-              <p className="mt-2 text-lg font-semibold text-white">Process over noise</p>
+            <div className="rounded-2xl border border-border/60 bg-background/60 p-4 dark:bg-black/20">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Focus</p>
+              <p className="mt-2 text-lg font-semibold text-foreground dark:text-white">Process over noise</p>
               <ArrowUpRight className="mt-5 h-5 w-5 text-emerald-300" />
             </div>
           </div>
@@ -122,7 +126,7 @@ function AuthScreen() {
                 {mode === "signin" ? "Masuk dan lanjutkan membaca performamu." : "Buat ruang privat untuk setiap eksekusi."}
               </p>
             </div>
-            <Card className="border-border/70 bg-background/25 shadow-xl shadow-black/10 backdrop-blur-[2px]">
+            <Card className="border-border/70 bg-card/85 shadow-xl shadow-black/10 backdrop-blur-[2px] dark:bg-background/25">
               <CardBody className="p-5 sm:p-6">
                 <form className="grid gap-4" onSubmit={submit}>
                   <Field label="Email">
