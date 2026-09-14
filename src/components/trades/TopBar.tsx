@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 
 import { AccountMenu } from "@/components/auth/AccountMenu";
+import { ThemeToggle } from "@/components/trades/ThemeToggle";
 
 interface TopBarProps {
   title?: string;
@@ -26,6 +27,7 @@ export function TopBar({ title = "Trade Journal", backTo, backLabel }: TopBarPro
         </div>
 
         <div className="flex min-w-[40px] flex-1 items-center justify-end">
+          <ThemeToggle />
           {backTo ? (
             <Link
               to={backTo}
