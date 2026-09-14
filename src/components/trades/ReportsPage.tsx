@@ -18,6 +18,8 @@ import {
 } from "recharts";
 import { Card, CardBody, CardHeader } from "@/components/kit/Card";
 import { Select } from "@/components/kit/Input";
+import { AnimatedMoneyTotals } from "@/components/trades/AnimatedMoneyTotals";
+import { CountUp } from "@/components/trades/CountUp";
 import { RRValue, RR_TOOLTIP } from "@/components/trades/RRValue";
 import {
   ChartSkeleton,
@@ -28,7 +30,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useTrades } from "@/hooks/useTrades";
-import { CURRENCY_OPTIONS, formatMoney, formatTotals } from "@/lib/money";
+import { CURRENCY_OPTIONS, formatMoney } from "@/lib/money";
 import type { Currency } from "@/types/trade";
 import { groupByPair, groupTrades, overall, withCumulative } from "@/lib/reports";
 
@@ -157,8 +159,16 @@ export function ReportsPage() {
           </div>
         ) : (
         <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <SummaryTile label="Total trade" value={String(total.trades)} />
-          <SummaryTile label="Win rate" value={`${total.winRate}%`} />
+          <SummaryTile label="Total trade" value={<CountUp value={total.trades} />} />
+          <SummaryTile label="Win rate" value={<CountUp value={total.winRate} suffix="%" />} />
+          <SummaryTile
+            label="W/L"
+            value={
+              <>
+                <CountUp value={total.wins} />/<CountUp value={total.losses} />
+              </>
+            }
+          />
           <div className="rounded-xl border border-border/50 bg-card/40 px-3 py-2.5 backdrop-blur-sm">
             <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
               Total profit
@@ -168,7 +178,11 @@ export function ReportsPage() {
                 total.netPnl > 0 ? "text-emerald-400" : total.netPnl < 0 ? "text-rose-400" : ""
               }`}
             >
-              {currency === ALL_CURRENCIES ? formatTotals(reportTrades) : moneyLabel(total.netPnl)}
+              {currency === ALL_CURRENCIES ? (
+                <AnimatedMoneyTotals trades={reportTrades} />
+              ) : (
+                <CountUp value={total.netPnl} format={moneyLabel} />
+              )}
             </p>
           </div>
           <div
@@ -178,7 +192,13 @@ export function ReportsPage() {
             <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
               Net P/L
             </p>
-            <RRValue rr={total.netRR} ratio={total.netRRRatio} withLabel className="mt-0.5 text-lg" />
+            <RRValue
+              rr={total.netRR}
+              ratio={total.netRRRatio}
+              animate
+              withLabel
+              className="mt-0.5 text-lg"
+            />
           </div>
           <div
             title={RR_TOOLTIP}
@@ -187,7 +207,7 @@ export function ReportsPage() {
             <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
               RR rata-rata
             </p>
-            <RRValue rr={total.avgRR} className="mt-0.5 text-lg" />
+            <RRValue rr={total.avgRR} animate className="mt-0.5 text-lg" />
           </div>
         </div>
         )}
@@ -509,7 +529,7 @@ export function ReportsPage() {
   );
 }
 
-function SummaryTile({ label, value }: { label: string; value: string }) {
+function SummaryTile({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="rounded-xl border border-border/50 bg-card/40 px-3 py-2.5 backdrop-blur-sm">
       <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
