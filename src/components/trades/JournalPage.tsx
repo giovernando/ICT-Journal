@@ -121,7 +121,7 @@ export function JournalPage() {
             </CardBody>
           </Card>
 
-          <Card className="min-w-0">
+          <Card className="h-fit min-w-0">
             <CardHeader
               title="Riwayat Trading"
               description={`${journal.filteredTrades.length} trade ditampilkan`}
