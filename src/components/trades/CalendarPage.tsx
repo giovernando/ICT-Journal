@@ -68,6 +68,12 @@ export function CalendarPage() {
             >
               Laporan
             </Link>
+            <Link
+              to="/economic-calendar"
+              className="rounded-xl border border-border/60 bg-card/50 px-3.5 py-2 text-xs font-semibold backdrop-blur-sm transition-colors hover:bg-card"
+            >
+              Economic Calendar
+            </Link>
           </div>
         </div>
 
