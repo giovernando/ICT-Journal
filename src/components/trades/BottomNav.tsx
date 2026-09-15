@@ -55,14 +55,14 @@ export function BottomNav({ onNewTrade }: { onNewTrade?: () => void }) {
         </div>
 
         <Link
-          to="/calendar"
+          to="/economic-calendar"
           onClick={triggerHaptic}
           className={itemClass}
           activeProps={{ className: `${itemClass} text-primary scale-[1.03]` }}
           inactiveProps={{ className: `${itemClass} text-muted-foreground hover:text-foreground` }}
         >
           <CalendarDays className="h-5 w-5" />
-          Kalender
+          News
         </Link>
       </div>
     </nav>
