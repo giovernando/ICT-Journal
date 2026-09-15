@@ -115,14 +115,7 @@ export function JournalPage() {
           )}
         </div>
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
-          <Card className="hidden h-fit lg:block">
-            <CardHeader title="Input Trade" description="Isi detail setup dan hasilnya" />
-            <CardBody>
-              <TradeForm onSubmit={journal.addTrade} />
-            </CardBody>
-          </Card>
-
+        <div className="mt-6">
           <Card className="h-fit min-w-0">
             <CardHeader
               title="Riwayat Trading"
