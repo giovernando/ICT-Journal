@@ -176,6 +176,7 @@ export function JournalPage() {
                 {journal.period === "Custom" && (
                   <div className="grid gap-2 sm:grid-cols-2">
                     <Input
+                      type="date"
                       aria-label="Dari tanggal"
                       value={journal.dateFrom}
                       onChange={(e) => journal.setDateFrom(e.target.value)}
